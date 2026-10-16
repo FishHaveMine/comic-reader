@@ -1,0 +1,28 @@
+{
+  "name": "comic-reader",
+  "version": "1.4.2",
+  "private": true,
+  "description": "无广告漫画阅读器：直连站点解析图片，磁盘缓存 + 自动预取下一章",
+  "main": "src/main/main.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "electron .",
+    "icon": "node scripts/make-icon.js",
+    "shortcut": "bash scripts/make-shortcut.sh",
+    "test": "node --test",
+    "typecheck": "node --check src/main/main.js && node --check src/main/session-source.js && node --check src/main/image-cache.js && node --check src/main/preload.js && node --check src/shared/parse-chapter.js && node --check src/shared/url.js && node --check src/renderer/auto-next.js && node --check src/renderer/renderer.js && node --check src/main/chapter-service.js && node --check scripts/check-reader-flow.js && node --check src/main/adb-sync.js && node --check src/main/progress-store.js && node --check src/shared/reading-progress.js && node --check scripts/install-android.js && node --check scripts/check-adb-sync-device.js && node --check src/shared/favorites.js && node --check src/shared/catalog-navigation.js && node --check src/main/catalog-window.js && node --check src/shared/chapter-directory.js && node --check scripts/check-chapter-directory.js && node --check scripts/check-catalog-flow.js && node --check scripts/build.js",
+    "test:flows": "electron scripts/check-reader-flow.js",
+    "build": "node scripts/build.js",
+    "build:desktop": "node scripts/build.js -p desktop",
+    "build:android": "node scripts/build.js -p android",
+    "build:all": "node scripts/build.js -p all",
+    "android:build": "cd mobile && flutter build apk --release",
+    "android:install": "node scripts/install-android.js",
+    "test:adb": "node scripts/check-adb-sync-device.js",
+    "test:directory": "electron scripts/check-chapter-directory.js",
+    "test:catalog": "electron scripts/check-catalog-flow.js"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0"
+  }
+}

@@ -1,0 +1,11 @@
+node_modules/
+dist/
+out/
+build/
+
+mobile/.dart_tool/
+mobile/build/
+mobile/android/.gradle/
+mobile/android/local.properties
+mobile/android/key.properties
+*.keystore

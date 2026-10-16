@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta
+    http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' comicimg: data:;"
+  />
+  <title>漫画阅读器</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="bar" id="bar">
+    <div class="bar__title">
+      <span class="bar__comic" id="comic-name">漫画阅读器</span>
+      <span class="bar__chapter" id="chapter-name"></span>
+    </div>
+
+    <form class="jump" id="jump-form" autocomplete="off" novalidate>
+      <input class="jump__input" id="url-input" type="text" aria-label="章节网址" spellcheck="false" placeholder="粘贴章节网址，回车打开" />
+      <button class="jump__submit" type="submit">打开</button>
+    </form>
+
+    <div class="bar__actions">
+      <span class="badge" id="badge" hidden></span>
+      <button class="icon-btn" id="btn-home" type="button" aria-label="返回首页" title="返回首页与搜索">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="m3 10 9-7 9 7v11h-6v-7H9v7H3Z" /></svg>
+      </button>
+      <button class="icon-btn" id="btn-favorite" type="button" aria-label="收藏漫画" aria-pressed="false" title="收藏漫画" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="m12 3 2.8 5.7 6.3.9-4.5 4.4 1 6.2-5.6-3-5.6 3 1-6.2L3 9.6l6.2-.9Z" /></svg>
+      </button>
+      <button class="icon-btn" id="btn-favorites" type="button" aria-label="我的收藏" title="我的收藏">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M6 3h13v18l-6.5-4-6.5 4Z"/><path d="M3 6v15"/></svg>
+      </button>
+      <button class="icon-btn" id="btn-chapters" type="button" aria-label="章节目录" title="章节目录" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 6h13M8 12h13M8 18h13M3 6h1M3 12h1M3 18h1"/></svg>
+      </button>
+      <button class="icon-btn" id="btn-prev" type="button" aria-label="上一话" title="上一话（←）">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+      </button>
+      <button class="icon-btn" id="btn-next" type="button" aria-label="下一话" title="下一话（→）">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+      </button>
+      <button class="icon-btn is-active" id="btn-autonext" type="button" aria-label="滚动到底自动翻下一话" title="滚动到底自动翻下一话">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 6 12 11 17 6" /><polyline points="7 13 12 18 17 13" /></svg>
+      </button>
+      <button class="icon-btn" id="btn-top" type="button" aria-label="回到顶部" title="回到顶部">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5" /><polyline points="5 12 12 5 19 12" /></svg>
+      </button>
+
+      <div class="bar__window" id="window-controls">
+        <button class="win-btn" id="btn-min" type="button" aria-label="最小化" title="最小化">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><line x1="2" y1="6" x2="10" y2="6" /></svg>
+        </button>
+        <button class="win-btn" id="btn-max" type="button" aria-label="最大化" title="最大化">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="2.5" y="2.5" width="7" height="7" rx="1" /></svg>
+        </button>
+        <button class="win-btn win-btn--close" id="btn-close" type="button" aria-label="关闭" title="关闭">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><line x1="3" y1="3" x2="9" y2="9" /><line x1="9" y1="3" x2="3" y2="9" /></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="reader" id="reader"></main>
+
+  <div class="overlay" id="overlay" role="status" aria-live="polite" hidden>
+    <p class="overlay__title" id="overlay-title">正在加载…</p>
+    <p class="overlay__detail" id="overlay-detail"></p>
+    <button class="overlay__retry" id="overlay-retry" type="button" hidden>重试</button>
+    <button class="overlay__retry" id="overlay-back" type="button" hidden>返回当前章节</button>
+  </div>
+
+  <footer class="statusbar">
+    <span id="status-pages">—</span>
+    <button class="statusbar__sync" id="status-sync" type="button" title="点击手动同步桌面与 Android 进度">ADB 未连接</button>
+    <span id="status-cache">—</span>
+  </footer>
+
+  <dialog class="favorites" id="favorites-dialog" aria-labelledby="favorites-title">
+    <div class="favorites__header"><h2 id="favorites-title">我的收藏</h2><button id="favorites-close" type="button" aria-label="关闭收藏">关闭</button></div>
+    <input class="favorites__search" id="favorites-search" type="search" aria-label="搜索收藏" placeholder="搜索漫画或章节" />
+    <p class="favorites__message" id="favorites-message" role="status"></p>
+    <div class="favorites__list" id="favorites-list"></div>
+  </dialog>
+
+  <dialog class="favorites chapters" id="chapters-dialog" aria-labelledby="chapters-title">
+    <div class="chapters__header">
+      <div class="chapters__heading"><h2 id="chapters-title">章节目录</h2><p id="chapters-comic"></p></div>
+      <button class="chapters__close" id="chapters-close" type="button" aria-label="关闭章节目录" title="关闭章节目录">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <div class="chapters__toolbar">
+      <input class="favorites__search" id="chapters-search" type="search" aria-label="搜索章节" placeholder="搜索章节名称" autofocus />
+      <div class="chapters__actions"><button id="chapters-order" type="button">倒序</button><button id="chapters-refresh" type="button">刷新目录</button></div>
+    </div>
+    <p class="favorites__message" id="chapters-message" role="status"></p>
+    <div class="favorites__list" id="chapters-list"></div>
+  </dialog>
+  <script src="auto-next.js"></script>
+  <script src="renderer.js"></script>
+</body>
+</html>
